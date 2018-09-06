@@ -1,0 +1,1 @@
+/afs/cern.ch/user/j/jvonahne/Hgammagamma/workdir/slim_analysis_cfg.py
