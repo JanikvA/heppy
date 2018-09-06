@@ -26,15 +26,12 @@ class Selection(Analyzer):
         self.counters['cut_flow'].inc('>=2 good photons')
 
         # Selecting the 2 photons making up the higgs candidate
-        if len(gammas)==2:
-            higgs_cand=Resonance(gammas[0],gammas[1],25)
-        else:
-            higgses = []
-            initial_tlv = TLorentzVector(0,0,0,240.)
-            for leg1, leg2 in itertools.combinations(gammas,2):
-                higgses.append( Resonance(leg1, leg2, 25) )
-            higgses.sort(key=lambda x: abs((initial_tlv-x._tlv).M()-91.2))
-            higgs_cand = higgses[0]
+        higgses = []
+        initial_tlv = TLorentzVector(0,0,0,240.)
+        for leg1, leg2 in itertools.combinations(gammas,2):
+            higgses.append( Resonance(leg1, leg2, 25) )
+        higgses.sort(key=lambda x: abs((initial_tlv-x._tlv).M()-91.2))
+        higgs_cand = higgses[0]
         h_gammas=[higgs_cand.leg1(),higgs_cand.leg2()]
 
         # Photon isolationsum
