@@ -18,11 +18,14 @@ class Selection(Analyzer):
         self.counters['cut_flow'].inc('All events')
 
         ptcs = getattr(event, self.cfg_ana.reco_ptc)        
+
+        # Selecting all "good" photons
         gammas = [g for g in ptcs if (abs(g.pdgid())==22 and g.e()>40. and g.eta()<2.5)]
         if len(gammas)<2:
             return False
         self.counters['cut_flow'].inc('>=2 good photons')
 
+        # Selecting the 2 photons making up the higgs candidate
         if len(gammas)==2:
             higgs_cand=Resonance(gammas[0],gammas[1],25)
         else:
@@ -34,15 +37,15 @@ class Selection(Analyzer):
             higgs_cand = higgses[0]
         h_gammas=[higgs_cand.leg1(),higgs_cand.leg2()]
 
-        # photon isolationsum
+        # Photon isolationsum
         iso_sum = 0
         for g in h_gammas:
             iso_sum += g.iso.sume/g.e() 
 
-        # pseudo rapidity gap of photons
+        # Pseudo rapidity gap of photons
         deta = abs(h_gammas[0].eta()-h_gammas[1].eta())
 
-        # angle between beampipe and higgs
+        # Angle between beampipe and higgs
         dtheta = 90.-higgs_cand.theta()*360./(2*math.pi)
 
         setattr(event, "selected_photons", h_gammas)
