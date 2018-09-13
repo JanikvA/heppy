@@ -25,7 +25,7 @@ class Selection(Analyzer):
             return False
         self.counters['cut_flow'].inc('>=2 good photons')
 
-        # Selecting the 2 photons making up the higgs candidate
+        # Selecting the 2 photons making up the higgs candidate 
         higgses = []
         initial_tlv = TLorentzVector(0,0,0,240.)
         for leg1, leg2 in itertools.combinations(gammas,2):
@@ -34,15 +34,15 @@ class Selection(Analyzer):
         higgs_cand = higgses[0]
         h_gammas=[higgs_cand.leg1(),higgs_cand.leg2()]
 
-        # Photon isolationsum
+        # Photon isolationsum (LEP3 <0.4)
         iso_sum = 0
         for g in h_gammas:
             iso_sum += g.iso.sume/g.e() 
 
-        # Pseudo rapidity gap of photons
+        # Pseudo rapidity gap of photons (LEP3 <1.8)
         deta = abs(h_gammas[0].eta()-h_gammas[1].eta())
 
-        # Angle between beampipe and higgs
+        # Angle between beampipe and higgs (LEP3 >25)
         dtheta = 90.-higgs_cand.theta()*360./(2*math.pi)
 
         setattr(event, "selected_photons", h_gammas)
