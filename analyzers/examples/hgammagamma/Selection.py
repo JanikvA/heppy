@@ -34,6 +34,9 @@ class Selection(Analyzer):
         higgs_cand = higgses[0]
         h_gammas=[higgs_cand.leg1(),higgs_cand.leg2()]
 
+        # system recoiling agaisnt the higgs (will be called zed):
+        zed_mass=(initial_tlv-higgs_cand._tlv).M()
+
         # Photon isolationsum (LEP3 <0.4)
         iso_sum = 0
         for g in h_gammas:
@@ -44,9 +47,15 @@ class Selection(Analyzer):
 
         # Angle between beampipe and higgs (LEP3 >25)
         dtheta = 90.-higgs_cand.theta()*360./(2*math.pi)
+		
+        for g in h_gammas:
+            ptcs.remove(g)
+
 
         setattr(event, "selected_photons", h_gammas)
         setattr(event, "higgs", higgs_cand)
         setattr(event, "isosum", iso_sum)
         setattr(event, "deta", deta)
         setattr(event, "dHtheta", dtheta)
+
+        setattr(event, "zed_mass", zed_mass)
