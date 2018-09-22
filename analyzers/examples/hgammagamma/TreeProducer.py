@@ -1,8 +1,94 @@
 from heppy.framework.analyzer import Analyzer
 from heppy.statistics.tree import Tree
 from heppy.analyzers.ntuple import *
+import math
 
 from ROOT import TFile
+
+from heppy.utils.deltar import deltaR, deltaPhi
+
+def dR_phitheta(p1,p2):
+    dphi=deltaPhi(p1.phi(),p2.phi())
+    dtheta=abs(p1.theta()-p2.theta())
+    dR=math.sqrt(dphi**2+dtheta**2)
+    return dR
+
+#def isosum_calc(dR, p1, p2 ,ptcCollection, debug=False):
+#    iso1=0
+#    iso2=0
+#    num1=0
+#    num2=0
+#    pass1=[]
+#    for ptc in ptcCollection:
+#        if ptc is p1: print "HOW"
+#        if ptc is p2: print "HOW"
+#        if deltaR(p1.eta(),p1.phi(),ptc.eta(),ptc.eta())<dR:
+#            iso1+=ptc.e()
+#            num1+=1
+#        if deltaR(p2.eta(),p2.phi(),ptc.eta(),ptc.eta())<dR:
+#            print deltaR(p2.eta(),p2.phi(),ptc.eta(),ptc.eta())
+#            iso2+=ptc.e()
+#            num2+=1
+#            pass1.append(ptc)
+#    isosum=iso1/p1.e() + iso2/p2.e()
+#    if debug:
+#        print num1,num2
+#        print iso1,iso2
+#        return pass1
+#    return isosum
+#
+#def isosum_calc2(dR, p1, p2 ,ptcCollection):
+#    iso1=0
+#    iso2=0
+#    for ptc in ptcCollection:
+#        if ptc is p1: print "HOW"
+#        if ptc is p2: print "HOW"
+#        if dR_phitheta(p1,ptc)<dR:
+#            iso1+=ptc.e()
+#        if dR_phitheta(p2,ptc)<dR:
+#            iso2+=ptc.e()
+#    isosum=iso1/p1.e() + iso2/p2.e()
+#    return isosum
+
+
+
+
+class isoClass(object):
+    def __init__(self, ptc, ptcColl, dR):
+        self.ptc=ptc
+        self.ptcColl=ptcColl
+
+        self.isoe=0
+        self.num=0
+        self.ptcs=[]
+
+        self.isosum_calc2(dR)
+
+#    def isosum_calc(self, dR):
+#        for ptc in self.ptcColl:
+#            #print deltaR(self.ptc.eta(),self.ptc.phi(),ptc.eta(),ptc.eta())
+#            if deltaR(self.ptc.eta(),self.ptc.phi(),ptc.eta(),ptc.eta())<dR:
+#                self.isoe+=ptc.e()
+#                self.num+=1
+#                self.ptcs.append(ptc)
+
+    def isosum_calc2(self, dR):
+        for ptc in self.ptcColl:
+            #print dR_phitheta(self.ptc,ptc)
+            if dR_phitheta(self.ptc,ptc)<dR:
+                self.isoe+=ptc.e()
+                self.num+=1
+                self.ptcs.append(ptc)
+
+
+def isosum_calc(dR,p1,p2,ptcColl):
+    isosum=0
+    g1=isoClass(p1,ptcColl,dR)
+    g2=isoClass(p2,ptcColl,dR)
+    return g1.isoe/p1.e()+g2.isoe/p2.e()
+
+
+
 
 class TreeProducer(Analyzer):
 
@@ -21,6 +107,18 @@ class TreeProducer(Analyzer):
         var(self.tree, "njet")
         var(self.tree, "zed_mass")
         
+        var(self.tree, "jj_mass")
+        var(self.tree, "m_vis")
+        var(self.tree, "isosum01")
+        var(self.tree, "isosum02")
+        var(self.tree, "isosum03")
+        var(self.tree, "isosum04")
+        var(self.tree, "isosum05")
+        var(self.tree, "isosum06")
+        var(self.tree, "isosum08")
+        var(self.tree, "isosum10")
+        var(self.tree, "isosum15")
+        var(self.tree, "isosum20")
        
     def process(self, event):
         self.tree.reset()
@@ -43,6 +141,40 @@ class TreeProducer(Analyzer):
         fill(self.tree, "dHtheta", dHtheta)
         fill(self.tree, "njet", len(jets))
         fill(self.tree, "zed_mass", zed_mass)
+
+
+        if len(jets)>1:
+            jj=(jets[0]._tlv+jets[1]._tlv)
+            fill(self.tree, "jj_mass", jj.M())
+            fill(self.tree, "m_vis", (jj+higgs._tlv).M())
+        else:
+            fill(self.tree, "jj_mass", -99)
+            fill(self.tree, "m_vis", -99)
+
+        # own isosum calculation
+        recoPtcs=getattr(event, self.cfg_ana.recoPtcs)
+
+        #g1=isoClass(photons[0],recoPtcs)
+        #g2=isoClass(photons[1],recoPtcs)
+
+        #print "g1 E", g1.isoe, g1.ptc.iso.sume
+        #print "g1 num", g1.num, g1.ptc.iso.num
+        #print "g2 E", g2.isoe, g2.ptc.iso.sume
+        #print "g2 num", g2.num, g2.ptc.iso.num
+
+
+
+        fill(self.tree, "isosum01", isosum_calc(0.1,photons[0],photons[1],recoPtcs))
+        fill(self.tree, "isosum02", isosum_calc(0.2,photons[0],photons[1],recoPtcs))
+        fill(self.tree, "isosum03", isosum_calc(0.3,photons[0],photons[1],recoPtcs))
+        fill(self.tree, "isosum04", isosum_calc(0.4,photons[0],photons[1],recoPtcs))
+        fill(self.tree, "isosum05", isosum_calc(0.5,photons[0],photons[1],recoPtcs))
+        fill(self.tree, "isosum06", isosum_calc(0.6,photons[0],photons[1],recoPtcs))
+        fill(self.tree, "isosum08", isosum_calc(0.8,photons[0],photons[1],recoPtcs))
+        fill(self.tree, "isosum10", isosum_calc(1.0,photons[0],photons[1],recoPtcs))
+        fill(self.tree, "isosum15", isosum_calc(1.5,photons[0],photons[1],recoPtcs))
+        fill(self.tree, "isosum20", isosum_calc(2.0,photons[0],photons[1],recoPtcs))
+
 
         self.tree.tree.Fill()
         

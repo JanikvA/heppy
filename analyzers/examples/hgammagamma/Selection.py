@@ -6,6 +6,9 @@ from ROOT import TLorentzVector
 import itertools
 import math 
 
+    
+
+
 class Selection(Analyzer):
 
     def beginLoop(self, setup):
@@ -50,6 +53,8 @@ class Selection(Analyzer):
 		
         for g in h_gammas:
             ptcs.remove(g)
+
+        # Self calculated isosum with different dR
 
 
         setattr(event, "selected_photons", h_gammas)

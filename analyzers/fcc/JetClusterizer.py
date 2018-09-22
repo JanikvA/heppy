@@ -59,8 +59,8 @@ class JetClusterizer(Analyzer):
             if 'ptmin' in args:
                 self.clusterizer = CCJetClusterizer(0)
                 def clusterize():
-                    return self.clusterizer.make_inclusive_jets(args['ptmin'],
-                                                                0.4) 
+                    return self.clusterizer.make_inclusive_jets(args['ptmin'])#,
+                                                                #0.4) 
                 self.clusterize = clusterize
             elif 'njets' in args:
                 self.njets = args['njets']
