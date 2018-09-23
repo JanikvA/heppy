@@ -108,6 +108,11 @@ class TreeProducer(Analyzer):
         var(self.tree, "zed_mass")
         
         var(self.tree, "jj_mass")
+        var(self.tree, "jj_phi")
+        var(self.tree, "jj_theta")
+        var(self.tree, "jj_dphi")
+        var(self.tree, "jj_dtheta")
+        var(self.tree, "jj_dR")
         var(self.tree, "m_vis")
         var(self.tree, "isosum01")
         var(self.tree, "isosum02")
@@ -146,23 +151,39 @@ class TreeProducer(Analyzer):
         if len(jets)>1:
             jj=(jets[0]._tlv+jets[1]._tlv)
             fill(self.tree, "jj_mass", jj.M())
+            fill(self.tree, "jj_phi", jj.Phi())
+            fill(self.tree, "jj_theta", jj.Theta())
+            fill(self.tree, "jj_dphi", deltaPhi(jets[0].phi(),jets[1].phi()))
+            fill(self.tree, "jj_dtheta", abs(jets[0].eta()-jets[1].eta()))
+            fill(self.tree, "jj_dR", deltaR(jets[0].theta(),jets[0].phi(),jets[1].theta(),jets[1].phi()))
             fill(self.tree, "m_vis", (jj+higgs._tlv).M())
         else:
             fill(self.tree, "jj_mass", -99)
+            fill(self.tree, "jj_phi", -99)
+            fill(self.tree, "jj_theta", -99)
+            fill(self.tree, "jj_dphi", -99)
+            fill(self.tree, "jj_dtheta", -99)
+            fill(self.tree, "jj_dR", -99)
             fill(self.tree, "m_vis", -99)
 
         # own isosum calculation
         recoPtcs=getattr(event, self.cfg_ana.recoPtcs)
 
-        #g1=isoClass(photons[0],recoPtcs)
-        #g2=isoClass(photons[1],recoPtcs)
 
-        #print "g1 E", g1.isoe, g1.ptc.iso.sume
-        #print "g1 num", g1.num, g1.ptc.iso.num
-        #print "g2 E", g2.isoe, g2.ptc.iso.sume
-        #print "g2 num", g2.num, g2.ptc.iso.num
-
-
+        # This shows that Colins code is not adapting correctly to lepton collider. Isolation is still calculated with eta,phi and not theta,phi
+        #print "##########"
+        #g2=isoClass(photons[1],recoPtcs, 0.4)
+        #if g2.isoe!=photons[1].iso.sume:
+        #    for ptc in g2.ptcs:
+        #        print "ptc: ",ptc.pdgid()
+        #        if ptc in photons[1].iso.particles:
+        #            continue                    
+        #        print deltaR(ptc,photons[1])
+        #        print deltaR(photons[1],ptc)
+        #        print dR_phitheta(photons[1],ptc)
+        #        print deltaR(photons[1].eta(),photons[1].phi(),ptc.eta(),ptc.phi())
+        #        print deltaR(photons[1].theta(),photons[1].phi(),ptc.theta(),ptc.phi())
+        #print "##########"
 
         fill(self.tree, "isosum01", isosum_calc(0.1,photons[0],photons[1],recoPtcs))
         fill(self.tree, "isosum02", isosum_calc(0.2,photons[0],photons[1],recoPtcs))
