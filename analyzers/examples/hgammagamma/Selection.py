@@ -6,8 +6,6 @@ from ROOT import TLorentzVector
 import itertools
 import math 
 
-    
-
 
 class Selection(Analyzer):
 
@@ -37,7 +35,7 @@ class Selection(Analyzer):
         higgs_cand = higgses[0]
         h_gammas=[higgs_cand.leg1(),higgs_cand.leg2()]
 
-        # system recoiling agaisnt the higgs (will be called zed):
+        # system recoiling against the higgs (will be called zed):
         zed_mass=(initial_tlv-higgs_cand._tlv).M()
 
         # Photon isolationsum (LEP3 <0.4)
@@ -48,13 +46,12 @@ class Selection(Analyzer):
         # Pseudo rapidity gap of photons (LEP3 <1.8)
         deta = abs(h_gammas[0].eta()-h_gammas[1].eta())
 
-        # Angle between beampipe and higgs (LEP3 >25)
+        # Angle between beampipe and higgs (LEP3 >25 && <165)
         dtheta = 90.-higgs_cand.theta()*360./(2*math.pi)
 		
+
         for g in h_gammas:
             ptcs.remove(g)
-
-        # Self calculated isosum with different dR
 
 
         setattr(event, "selected_photons", h_gammas)
@@ -62,5 +59,4 @@ class Selection(Analyzer):
         setattr(event, "isosum", iso_sum)
         setattr(event, "deta", deta)
         setattr(event, "dHtheta", dtheta)
-
         setattr(event, "zed_mass", zed_mass)
