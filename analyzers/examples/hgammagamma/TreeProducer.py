@@ -69,7 +69,6 @@ class TreeProducer(Analyzer):
         deta = getattr(event, self.cfg_ana.deta)
         dHtheta = getattr(event, self.cfg_ana.dHtheta)
         zed_mass = getattr(event, self.cfg_ana.zed_mass)
-        missing_energy = getattr(event, self.cfg_ana.missing_energy)
         jets = getattr(event, self.cfg_ana.jets)
 
         fillParticle(self.tree, 'photon1', photons[0] )        
