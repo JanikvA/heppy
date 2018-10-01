@@ -102,6 +102,17 @@ sel_iso_leptons = cfg.Analyzer(
 )
 
 
+from heppy.analyzers.GenResonanceAnalyzer import GenResonanceAnalyzer
+gen_bosons = cfg.Analyzer(
+    GenResonanceAnalyzer,
+    output='gen_bosons', 
+    pdgids=[23, 25],
+    statuses=[62],
+    # decay_pdgids=[11, 13],
+    verbose=False, 
+)
+
+
 # make 4 exclusive jets 
 from heppy.analyzers.fcc.JetClusterizer import JetClusterizer
 jets = cfg.Analyzer(
@@ -130,14 +141,19 @@ selection = cfg.Analyzer(
 from heppy.analyzers.examples.hgammagamma.TreeProducer import TreeProducer
 tree = cfg.Analyzer(
     TreeProducer,
+       particles=[],
+    iso_particles=[], 
+    jets=[],
+    resonances=[('gen_bosons',2)],
     recoPtcs='rec_particles',
 	higgs="higgs",
 	isosum="isosum",
 	deta="deta",
 	dHtheta="dHtheta",
-    jets="jets",
+    jets1="jets",
     zed_mass="zed_mass",
-    selected_photons='selected_photons'
+    selected_photons='selected_photons',
+    gen_bosons='gen_bosons'
 )
 
 # definition of the sequence of analyzers,
@@ -147,6 +163,7 @@ sequence = cfg.Sequence(
     papas_sequence, 
 	photons,
 	iso_photons,
+    gen_bosons,
     selection, 
     jets,
     tree,
